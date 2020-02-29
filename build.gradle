@@ -1,0 +1,96 @@
+buildscript {
+    ext {
+        springBootVersion = "2.2.1.RELEASE"
+    }
+
+    repositories {
+        mavenLocal()
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        mavenCentral()
+    }
+    dependencies {
+        classpath(
+                "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}",
+        )
+    }
+}
+
+plugins {
+    id 'java'
+    id 'idea'
+    id "org.springframework.boot" version "2.2.1.RELEASE"
+    id "io.spring.dependency-management" version "1.0.9.RELEASE"
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:Hoxton.RELEASE"
+    }
+}
+
+
+configurations.all {
+    //每隔24小时检查远程依赖是否存在更新
+//    resolutionStrategy.cacheChangingModulesFor 24, 'hours'
+    //每隔10分钟..
+    resolutionStrategy.cacheChangingModulesFor 1, 'minutes'
+    // 采用动态版本声明的依赖缓存10分钟
+    resolutionStrategy.cacheDynamicVersionsFor 10*60, 'seconds'
+}
+
+
+group 'org.young'
+version '1.0.0-SNAPSHOT'
+
+[compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
+
+compileJava {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs = ['src/main/java', 'src/main/resources']
+        }
+    }
+}
+
+springBoot {
+    buildInfo()
+}
+
+
+test {
+    useJUnitPlatform()
+}
+
+repositories {
+    mavenLocal()
+    maven { url "http://maven.aliyun.com/nexus/content/groups/public" }
+    mavenCentral()
+}
+
+ext {
+    lombokVersion = "1.18.12"
+    springCloudVersion = "2.2.0.RELEASE"
+    junitVersion = "5.2.0"
+}
+
+dependencies {
+
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+    compile(
+            "org.springframework.cloud:spring-cloud-starter-netflix-eureka-server:${springCloudVersion}" ,
+            'com.google.code.gson:gson:2.8.6'
+
+    )
+
+    testCompile(
+            "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
+    )
+}
+
